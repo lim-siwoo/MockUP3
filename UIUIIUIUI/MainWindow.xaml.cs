@@ -27,6 +27,8 @@ namespace UIUIIUIUI
     {
         private DeploymentInfo _currentDeployment;
         private Random _random = new Random();
+        private int _refreshCount = 0;
+        private bool _serviceRunning = true;
 
         public MainWindow()
         {
@@ -37,6 +39,9 @@ namespace UIUIIUIUI
 
             // 앱 시작 시 새 버전 알림 표시 (목업용)
             SimulateNewVersionDeployment();
+
+            // 타이틀바 설정
+            Title = $"엣지 디바이스 배포 확인 v{GetAppVersion()}";
         }
 
         private void LoadDeploymentInfo()
@@ -49,7 +54,7 @@ namespace UIUIIUIUI
                 DeploymentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                 DeviceId = "EDGE-DEVICE-" + _random.Next(1000, 9999).ToString(),
                 Status = DeploymentStatus.Success,
-                Changelog = "• 보안 업데이트 적용\n• UI 성능 개선\n• 배터리 소모량 최적화\n• 네트워크 연결 안정성 향상"
+                Changelog = "• 보안 업데이트 적용\n• UI 성능 개선\n• 배터리 소모량 최적화\n• 네트워크 연결 안정성 향상\n• 다크 모드 지원 추가\n• 타이틀바 버전 표시 추가\n• 서비스 시작/중단 버튼 추가"
             };
 
             UpdateUI();
@@ -57,8 +62,8 @@ namespace UIUIIUIUI
 
         private string GetAppVersion()
         {
-
-            return "1.0.0";
+            // 버전 1.0.1로 업데이트
+            return "1.0.1";
         }
 
         private void UpdateUI()
@@ -97,6 +102,9 @@ namespace UIUIIUIUI
             }
 
             ChangelogTextBlock.Text = _currentDeployment.Changelog;
+
+            // 앱 바 표시 설정
+            RefreshCountTextBlock.Text = $"새로고침 횟수: {_refreshCount}";
         }
 
         private async void SimulateNewVersionDeployment()
@@ -110,12 +118,93 @@ namespace UIUIIUIUI
         {
             // 목업용: 새로고침 시 배포 시간 업데이트
             _currentDeployment.DeploymentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            _refreshCount++;
+            UpdateUI();
+
+            // 랜덤하게 상태 변경 (테스트용)
+            int randomState = _random.Next(3);
+            switch (randomState)
+            {
+                case 0:
+                    _currentDeployment.Status = DeploymentStatus.Success;
+                    break;
+                case 1:
+                    _currentDeployment.Status = DeploymentStatus.Failed;
+                    break;
+                case 2:
+                    _currentDeployment.Status = DeploymentStatus.InProgress;
+                    break;
+            }
             UpdateUI();
         }
 
         private void DismissNotification_Click(object sender, RoutedEventArgs e)
         {
             NewVersionNotification.Visibility = Visibility.Collapsed;
+        }
+
+        private void ToggleTheme_Click(object sender, RoutedEventArgs e)
+        {
+            // 테마 전환 (라이트/다크)
+            if (this.Content is FrameworkElement element)
+            {
+                if (element.RequestedTheme == ElementTheme.Light)
+                {
+                    element.RequestedTheme = ElementTheme.Dark;
+                    ThemeButton.Content = "라이트 모드";
+                }
+                else
+                {
+                    element.RequestedTheme = ElementTheme.Light;
+                    ThemeButton.Content = "다크 모드";
+                }
+            }
+        }
+
+        private async void StartService_Click(object sender, RoutedEventArgs e)
+        {
+            // 서비스 시작 시뮬레이션
+            if (!_serviceRunning)
+            {
+                // UI 업데이트
+                ServiceStatusBorder.Background = new SolidColorBrush(Microsoft.UI.Colors.Gray);
+                ServiceStatusText.Text = "시작 중...";
+                StartServiceButton.IsEnabled = false;
+                StopServiceButton.IsEnabled = false;
+
+                // 시작 딜레이 시뮬레이션
+                await Task.Delay(1500);
+
+                // 서비스 상태 업데이트
+                _serviceRunning = true;
+                ServiceStatusBorder.Background = new SolidColorBrush(Microsoft.UI.Colors.Green);
+                ServiceStatusText.Text = "실행 중";
+                StartServiceButton.IsEnabled = false;
+                StopServiceButton.IsEnabled = true;
+            }
+        }
+
+        private async void StopService_Click(object sender, RoutedEventArgs e)
+        {
+            // 서비스 중지 시뮬레이션
+            if (_serviceRunning)
+            {
+                // UI 업데이트
+                ServiceStatusBorder.Background = new SolidColorBrush(Microsoft.UI.Colors.Gray);
+                ServiceStatusText.Text = "중지 중...";
+                StartServiceButton.IsEnabled = false;
+                StopServiceButton.IsEnabled = false;
+
+                // 중지 딜레이 시뮬레이션
+                await Task.Delay(1500);
+
+                // 서비스 상태 업데이트
+                _serviceRunning = false;
+                ServiceStatusBorder.Background = new SolidColorBrush(Microsoft.UI.Colors.Red);
+                ServiceStatusText.Text = "중지됨";
+                StartServiceButton.IsEnabled = true;
+                StopServiceButton.IsEnabled = false;
+            }
         }
     }
 

@@ -10,7 +10,44 @@
     Title="UIUIIUIUI">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Padding="20">
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="250"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- 상단 앱 바 -->
+        <Grid Grid.Row="0" Grid.ColumnSpan="2"
+              Background="{ThemeResource SystemAccentColorDark1}" 
+              Height="40" 
+              Padding="12,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock x:Name="RefreshCountTextBlock" 
+                       Text="새로고침 횟수: 0" 
+                       VerticalAlignment="Center" 
+                       Foreground="White"/>
+
+            <Button x:Name="ThemeButton" 
+                    Grid.Column="1" 
+                    Content="다크 모드" 
+                    VerticalAlignment="Center"
+                    Click="ToggleTheme_Click"/>
+        </Grid>
+
+        <!-- 메인 콘텐츠 -->
+        <StackPanel Grid.Row="1" Grid.Column="0"
+                   HorizontalAlignment="Center" 
+                   VerticalAlignment="Center" 
+                   Spacing="20">
             <TextBlock x:Name="AppTitleTextBlock" 
                        Text="엣지 디바이스 배포 확인 프로그램" 
                        FontSize="32" 
@@ -40,7 +77,7 @@
                         CornerRadius="8" 
                         Padding="12,8">
                     <TextBlock x:Name="VersionTextBlock" 
-                               Text="1.0.0" 
+                               Text="1.0.1" 
                                FontSize="24" 
                                FontWeight="SemiBold" 
                                Foreground="White"/>
@@ -89,8 +126,8 @@
                 </StackPanel>
             </Grid>
 
-            <Border Background="#f0f0f0" 
-                    BorderBrush="#d0d0d0" 
+            <Border Background="{ThemeResource CardBackgroundFillColorDefault}" 
+                    BorderBrush="{ThemeResource CardStrokeColorDefault}" 
                     BorderThickness="1" 
                     CornerRadius="8" 
                     Padding="16" 
@@ -98,13 +135,11 @@
                 <StackPanel Spacing="4">
                     <TextBlock Text="변경 내역:" 
                                FontSize="18" 
-                               FontWeight="SemiBold"
-                               Foreground="Black"/>
+                               FontWeight="SemiBold"/>
                     <TextBlock x:Name="ChangelogTextBlock" 
-                               Text="• 보안 업데이트 적용&#x0A;• UI 성능 개선&#x0A;• 배터리 소모량 최적화&#x0A;• 네트워크 연결 안정성 향상" 
+                               Text="• 보안 업데이트 적용&#x0A;• UI 성능 개선&#x0A;• 배터리 소모량 최적화&#x0A;• 네트워크 연결 안정성 향상&#x0A;• 다크 모드 지원 추가&#x0A;• 타이틀바 버전 표시 추가&#x0A;• 서비스 시작/중단 버튼 추가" 
                                FontSize="16" 
-                               TextWrapping="Wrap"
-                               Foreground="Black"/>
+                               TextWrapping="Wrap"/>
                 </StackPanel>
             </Border>
 
@@ -116,8 +151,91 @@
                     Click="RefreshButton_Click"/>
         </StackPanel>
 
+        <!-- 큰 시작/중단 버튼 영역 -->
+        <Grid Grid.Row="1" Grid.Column="1" 
+              Margin="20,0,0,0">
+            <StackPanel VerticalAlignment="Center"
+                        Spacing="20">
+                <Border Background="{ThemeResource CardBackgroundFillColorDefault}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefault}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="16">
+                    <TextBlock Text="서비스 제어" 
+                               FontSize="24" 
+                               FontWeight="SemiBold" 
+                               HorizontalAlignment="Center"/>
+                </Border>
+
+                <Button x:Name="StartServiceButton"
+                        Height="100"
+                        HorizontalAlignment="Stretch"
+                        Background="#0da841"
+                        Foreground="White"
+                        BorderThickness="0"
+                        CornerRadius="8"
+                        Click="StartService_Click">
+                    <StackPanel>
+                        <FontIcon Glyph="&#xE768;" 
+                                  FontSize="36"/>
+                        <TextBlock Text="시작" 
+                                   FontSize="28" 
+                                   FontWeight="Bold"/>
+                    </StackPanel>
+                </Button>
+
+                <Button x:Name="StopServiceButton"
+                        Height="100"
+                        HorizontalAlignment="Stretch"
+                        Background="#e81123"
+                        Foreground="White"
+                        BorderThickness="0"
+                        CornerRadius="8"
+                        Click="StopService_Click">
+                    <StackPanel>
+                        <FontIcon Glyph="&#xE71A;" 
+                                  FontSize="36"/>
+                        <TextBlock Text="중단" 
+                                   FontSize="28" 
+                                   FontWeight="Bold"/>
+                    </StackPanel>
+                </Button>
+
+                <Border x:Name="ServiceStatusBorder"
+                        Background="#0da841"
+                        BorderThickness="0"
+                        CornerRadius="8"
+                        Padding="16"
+                        Margin="0,20,0,0">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="현재 상태" 
+                                   FontSize="18" 
+                                   Foreground="White" 
+                                   HorizontalAlignment="Center"/>
+                        <TextBlock x:Name="ServiceStatusText" 
+                                   Text="실행 중" 
+                                   FontSize="22" 
+                                   FontWeight="Bold" 
+                                   Foreground="White" 
+                                   HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Grid>
+
+        <!-- 하단 상태 바 -->
+        <StackPanel Grid.Row="2" Grid.ColumnSpan="2"
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Right" 
+                    Padding="0,8,0,0">
+            <TextBlock Text="v1.0.1" 
+                       Foreground="{ThemeResource TextFillColorSecondary}" 
+                       FontSize="12"/>
+        </StackPanel>
+
         <!-- 새 버전 알림 팝업 -->
         <Grid x:Name="NewVersionNotification" 
+              Grid.Row="2" Grid.ColumnSpan="2"
               Background="{ThemeResource SystemAccentColorDark1}" 
               VerticalAlignment="Bottom" 
               HorizontalAlignment="Stretch" 
